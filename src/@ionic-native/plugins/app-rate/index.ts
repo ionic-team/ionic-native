@@ -51,6 +51,11 @@ export interface AppRatePreferences {
    * App Store URLS
    */
   storeAppURL?: AppUrls;
+  
+  /**
+   * Open Store URL
+   */
+  openUrl?: (url: string) => void;
 }
 
 export interface AppRateCustomLocale {
@@ -162,7 +167,8 @@ export interface AppUrls {
  *    ios: '<app_id>',
  *    android: 'market://details?id=<package_name>',
  *    windows: 'ms-windows-store://review/?ProductId=<store_id>'
- *   }
+ *   },
+ *   openUrl: this.appRate.preferences.openUrl // @see https://github.com/pushandplay/cordova-plugin-apprate#installation-prerequisites
  * }
  *
  * this.appRate.promptForRating(false);
