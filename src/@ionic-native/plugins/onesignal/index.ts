@@ -771,14 +771,32 @@ export class OneSignal extends IonicNativePlugin {
   /**
    * Allows you to use your own system's user ID's to send push notifications to your users.
    * To tie a user to a given user ID, you can use this method.
+   *
+   * The callback result JSONObject param will contain push and email success statuses:
+   * {
+   *   push: { success: boolean },
+   *   email?: { success: boolean }
+   * }
+   * 'Push' can be expected in almost every situation with a success status, but
+   * as a pre-caution its good to verify if it exists.
    * @param {string} externalId
+   * @param {Function} callback
    */
   @Cordova()
-  setExternalUserId(externalId: string): void {}
+  setExternalUserId(externalId: string, callback?: Function): void {}
 
   /**
    * Removes whatever was set as the current user's external user ID.
+   *
+   * The callback result JSONObject param will contain push and email success statuses:
+   * {
+   *   push: { success: boolean },
+   *   email?: { success: boolean }
+   * }
+   * 'Push' can be expected in almost every situation with a success status, but
+   * as a pre-caution its good to verify if it exists.
+   * @param {Function} callback
    */
   @Cordova()
-  removeExternalUserId(): void {}
+  removeExternalUserId(callback?: Function): void {}
 }
