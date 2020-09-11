@@ -635,7 +635,7 @@ export interface CommandsArray extends Array<PrintCommand> {}
  * ...
  *
  *
- * this.starprnt.portDiscovery('all')
+ * this.starprnt.portDiscovery('All')
  *   .then((res: any) => console.log(res))
  *   .catch((error: any) => console.error(error));
  *

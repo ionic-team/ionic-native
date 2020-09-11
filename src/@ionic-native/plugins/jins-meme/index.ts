@@ -34,7 +34,7 @@ declare const cordova: any;
   pluginName: 'JINS MEME',
   plugin: 'cordova-plugin-jins-meme',
   pluginRef: 'JinsMemePlugin',
-  repo: 'https://github.com/BlyncSync/cordova-plugin-jins-meme',
+  repo: 'https://github.com/jins-meme/JinsMemeSDK-Plugin-Cordova',
   platforms: ['Android', 'iOS'],
 })
 @Injectable()

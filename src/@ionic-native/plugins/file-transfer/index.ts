@@ -106,14 +106,12 @@ export interface FileTransferError {
  * @description
  * This plugin allows you to upload and download files.
  *
- * @deprecated
- * This plugin has been deprecated in favor of XHR2
- * https://cordova.apache.org/blog/2017/10/18/from-filetransfer-to-xhr2.html
+ * This plugin has been deprecated [in favor of XHR2](https://cordova.apache.org/blog/2017/10/18/from-filetransfer-to-xhr2.html).
  *
  * @usage
  * ```typescript
  * import { FileTransfer, FileUploadOptions, FileTransferObject } from '@ionic-native/file-transfer/ngx';
- * import { File } from '@ionic-native/file';
+ * import { File } from '@ionic-native/file/ngx';
  *
  * constructor(private transfer: FileTransfer, private file: File) { }
  *
