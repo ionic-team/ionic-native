@@ -756,6 +756,7 @@ export class File extends IonicNativePlugin {
 
   /**
    * Get free disk space in Bytes
+   * For Android, it returns KB.
    * @returns {Promise<number>} Returns a promise that resolves with the remaining free disk space in Bytes
    */
   @CordovaCheck()
