@@ -17,12 +17,17 @@ import { error } from 'console';
   plugin: 'cordova-plugin-hypertrack-v3',
   pluginRef: 'hypertrack',
   repo: 'https://github.com/hypertrack/cordova-plugin-hypertrack.git',
-  platforms: ['Android'],
+  platforms: ['Android, iOS'],
 })
 @Injectable()
 export class HyperTrackPlugin extends IonicNativePlugin {
   @Cordova()
   initialize(publishableKey: string): Promise<HyperTrackCordova> {
+    return;
+  }
+
+  @Cordova()
+  getBlockers(): Promise<Set<Blocker>> {
     return;
   }
 
@@ -59,10 +64,17 @@ interface HyperTrackCordova {
     success: SuccessHandler,
     error: FailureHandler
   ): void;
-  addGeoTag(geotagData: Object, expectedLocation: Coordinates, success: SuccessHandler, error: FailureHandler): void;
+  addGeoTag(
+    geotagData: Object,
+    expectedLocation: Coordinates | undefined,
+    success: SuccessHandler,
+    error: FailureHandler
+  ): void;
   requestPermissionsIfNecessary(success: SuccessHandler, error: FailureHandler): void;
   allowMockLocations(success: SuccessHandler, error: FailureHandler): void;
   syncDeviceSettings(success: SuccessHandler, error: FailureHandler): void;
+  start(success: SuccessHandler, error: FailureHandler): void;
+  stop(success: SuccessHandler, error: FailureHandler): void;
 }
 
 export class CoordinatesValidationError extends Error {}
@@ -74,6 +86,18 @@ export class Coordinates {
       throw new CoordinatesValidationError('latitude and longitude should be of correct valaues');
     }
   }
+}
+
+/** A blocker is an obstacle that needs to be resolved to achieve reliable tracking. */
+export interface Blocker {
+  /** Recommended name for a user action, that needs to be performed to resolve the blocker. */
+  userActionTitle: String;
+  /** Recommended name for a button, that will navigate user to the place where he can resolve the blocker */
+  userActionCTA: String;
+  /** User action explanation */
+  userActionExplanation: String;
+  /** An action that navigates user to the dedicated settings menu. */
+  resolve: () => void;
 }
 
 /**
@@ -126,6 +150,15 @@ export class HyperTrack {
         })
         .catch((err: Error) => reject(err));
     });
+  }
+
+  /**
+   * Get the list of blockers that needs to be resolved for reliable tracking.
+   *
+   * @see {Blocker}
+   */
+  static getBlockers(): Promise<Set<Blocker>> {
+    return new HyperTrackPlugin().getBlockers();
   }
 
   /** Resolves device ID that could be used to identify the device. */
@@ -224,6 +257,26 @@ export class HyperTrack {
   syncDeviceSettings(): Promise<any> {
     return new Promise((resolve, reject) => {
       this.cordovaInstanceHandle.syncDeviceSettings(
+        () => resolve(),
+        err => reject(err)
+      );
+    });
+  }
+
+  /** Start tracking. */
+  start(): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.cordovaInstanceHandle.start(
+        () => resolve(),
+        err => reject(err)
+      );
+    });
+  }
+
+  /** Stop tracking. */
+  stop(): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.cordovaInstanceHandle.stop(
         () => resolve(),
         err => reject(err)
       );
