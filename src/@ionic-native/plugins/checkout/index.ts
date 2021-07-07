@@ -180,7 +180,7 @@ export interface Phone {
  */
 @Plugin({
   pluginName: 'Checkout',
-  plugin: 'cordova-plugin-checkout',
+  plugin: '@checkout.com/cordova-plugin-checkout',
   pluginRef: 'cordova.plugins.Checkout',
   repo: 'https://github.com/checkout/frames-cordova',
   install: '',
