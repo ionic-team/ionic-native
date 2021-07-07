@@ -1,17 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Plugin, Cordova, IonicNativePlugin } from '@ionic-native/core';
-
-export interface PreviewAnyFileOptions {
-  /**
-   * The name of the file to preview.
-   */
-  name?: string;
-  /**
-   * The mime type of the file to preview.
-   */
-  mimeType: string;
-}
-
+import { Observable } from 'rxjs';
 /**
  * @name PreviewAnyFile
  * @description
@@ -29,25 +18,37 @@ export interface PreviewAnyFileOptions {
  * ...
  *
  *
- * this.previewAnyFile.preview('file://filepath.ext')
- *   .then((res: any) => console.log(res))
- *   .catch((error: any) => console.error(error));
+ * this.previewAnyFile.previewPath('file://path/to/file.xls')
+ *   .subscribe(res => console.log(res),error => console.error(error))
  *
- * ```
+ * //if the file in the url has no extension, you must define the name or mimetype in the options
+ * this.previewAnyFile.previewPath('https://domain.com/file/pdfFile',{name:file.pdf})
+ *   .subscribe(res => console.log(res),error => console.error(error))
  *
+ * // view file from local folder in the app
+ * this.previewAnyFile.previewAsset('/assets/localFile.doc')
+ *   .subscribe(res => console.log(res),error => console.error(error))
  *
- * ...
+ * this.previewAnyFile.previewBase64('data:image/gif;base64,R0lGODlhP.....')
+ *   .subscribe(res => console.log(res),error => console.error(error))
  *
- *
- * this.previewAnyFile.previewPath('http://www.domain.com/samplefile')
- *   .then((res: any) => console.log(res))
- *   .catch((error: any) => console.error(error));
+ * //if the mime type not exist in the base64, you must define the name or mimetype in the options
+ * this.previewAnyFile.previewBase64('JVBERi0xLjMKJcTl8uXr.....',{mimeType:'application/pdf'})
+ *   .subscribe(res => console.log(res),error => console.error(error))
  *
  * ```
  */
 
+export interface PreviewOptions {
+  // overwrite the name of the file ex: file.pdf
+  name?: string;
+  // overwrite the mime type of the file ex: application/pdf
+  mimeType?: string;
+}
+
+export type PreviewResponse = 'CLOSING' | 'SUCCESS' | 'NO_APP';
 @Plugin({
-  pluginName: 'PreviewAnyFile',
+  pluginName: 'Preview/Open Any File',
   plugin: 'cordova-plugin-preview-any-file', // npm package name, example: cordova-plugin-camera
   pluginRef: 'PreviewAnyFile', // the variable reference to call the plugin, example: navigator.geolocation
   repo: 'https://github.com/mostafa-mansour1/previewAnyFile', // the github repository URL for the plugin
@@ -58,42 +59,58 @@ export interface PreviewAnyFileOptions {
 @Injectable()
 export class PreviewAnyFile extends IonicNativePlugin {
   /**
-   * this function return SUCCESS in success callback if the file successfully opened, if the content is base64 you have to write it into file by cordova-plugin-file
-   * @param url {string} full absolute URL for the file, if the path is content:// you need to resolve the native url, if the path is https:// it may not work in android
-   * @return {Promise<any>} Returns a promise that resolves if the file opened reject if not;
+   * @deprecated Use the previewPath,previewBase64 or previewAsset. they have more options
+   * @param url {String} full absolute URL -> file://, content://, http://, https, ... etc
+   * @return {Promise<PreviewResponse>} Returns a promise that resolves if the file opened reject if not;
+   * @author Mostafa Mansour <mostafa@outlook.kr>
    */
   @Cordova()
-  preview(url: string): Promise<string> {
+  preview(url: String): Promise<PreviewResponse> {
     return;
   }
 
   /**
-   * previewPath function will return success callback if the file successfully opened, if the content is base64 you have to use previewBase64 method
-   * @param base64 {String} base64 string content
-   * @param options {PreviewAnyFileOptions} define the name of the file with extension or it's mimeType, if the correct extension not exist in the path
+   * previewPath function will return SUCCESS,NO_APP or CLOSING in Observable Callback , if the content is base64 you have to use previewBase64 method
+   * @param path {String} full absolute URL -> file://, content://, http://, https, ... etc, if extension not exist, you must define it in the opt param
+   * @param opt {PreviewOptions} define the name of the file with extension or it's mimeType, if the correct extension not exist in the path
+   * @return {Observable<PreviewResponse>} Returns an Observable that resolves if the file opened, closed or not opened , it will reject if any error;
+   * @author Mostafa Mansour <mostafa@outlook.kr>
    */
-  @Cordova()
-  previewBase64(base64: string, options?: PreviewAnyFileOptions): Promise<string> {
-    return;
+  @Cordova({
+    observable: true,
+    callbackOrder: 'reverse',
+  })
+  previewPath(path: String, opt: PreviewOptions = {}): Observable<PreviewResponse> {
+    return; // We add return; here to avoid any IDE / Compiler errors
   }
 
   /**
-   * previewPath function will return success callback if the file successfully opened, if the content is base64 you have to use previewBase64 method
-   * @param url {String} full absolute URL -> file://, content://, http://, https, ... etc, if extension not exist, you must define it in the opt param
-   * @param options {PreviewAnyFileOptions} define the name of the file with extension or it's mimeType, if the correct extension not exist in the path
+   * previewBase64 function will return SUCCESS,NO_APP or CLOSING in Observable Callback , if the content is url or path you have to use previewPath method
+   * @param path {String} full absolute URL -> file://, content://, http://, https, ... etc, if extension not exist, you must define it in the opt param
+   * @param opt {PreviewOptions} define the name of the file with extension or it's mimeType, if the mimetype not exist in the base64 string
+   * @return {Observable<PreviewResponse>} Returns an Observable that resolves if the file opened, closed or not opened , it will reject if any error;
+   * @author Mostafa Mansour <mostafa@outlook.kr>
    */
-  @Cordova()
-  previewPath(url: string, options?: PreviewAnyFileOptions): Promise<string> {
-    return;
+  @Cordova({
+    observable: true,
+    callbackOrder: 'reverse',
+  })
+  previewBase64(base64: String, opt: PreviewOptions = {}): Observable<PreviewResponse> {
+    return; // We add return; here to avoid any IDE / Compiler errors
   }
 
   /**
-   * previewPath function will return success callback if the file successfully opened, if the content is base64 you have to use previewBase64 method
-   * @param url {String} full absolute URL -> file://, content://, http://, https, ... etc, if extension not exist, you must define it in the opt param
-   * @param options {PreviewAnyFileOptions} define the name of the file with extension or it's mimeType, if the correct extension not exist in the path
+   * Use previewAsset function to open a file from assets folder, it will return SUCCESS,NO_APP or CLOSING in Observable Callback ,
+   * @param path {String} relative path of the file from assets folder "/assets/file.pdf" , if extension not exist, you must define it in the opt param
+   * @param opt {PreviewOptions} define the name of the file with extension or it's mimeType, if the correct extension not exist in the path
+   * @return {Observable<PreviewResponse>} Returns an Observable that resolves if the file opened, closed or not opened , it will reject if any error;
+   * @author Mostafa Mansour <mostafa@outlook.kr>
    */
-  @Cordova()
-  previewAsset(url: string, options?: PreviewAnyFileOptions): Promise<string> {
-    return;
+  @Cordova({
+    observable: true,
+    callbackOrder: 'reverse',
+  })
+  previewAsset(path: String, opt: PreviewOptions = {}): Observable<PreviewResponse> {
+    return; // We add return; here to avoid any IDE / Compiler errors
   }
 }
