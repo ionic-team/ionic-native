@@ -115,6 +115,10 @@ export enum LoginType {
    */
   email = 'EMAIL',
   /**
+   * SAML 2.0 Login Type
+   */
+  saml2 = 'SAML2',
+  /**
    * TODO:
    */
   custom = 'CUSTOM',
@@ -207,6 +211,10 @@ export enum NotificationListenerType {
    * Notify when the sent item count changes.
    */
   SentItemChanged = 11,
+  /**
+   * Notify that the JWT token is received
+   */
+  JWTTokenReceived = 12
 }
 
 export enum AttachmentItemStatus {
@@ -390,8 +398,7 @@ export class LoginParameters {
   persistWebDb: boolean;
 
   /*
-   * Optional jwt token parameter. Please check with your Unvired Admin for this value.
-   * For Example:
+   * JWT options.
    * loginParameters.jwtOptions = {"app": "myapp"};
    */
   jwtOptions: object;
@@ -401,6 +408,18 @@ export class LoginParameters {
    * The default value of this is 'en'.
    */
   loginLanguage: string;
+
+  /**
+   * Applicable for browser only. Set this flag to indicate that saved data should be reloaded upon launch.
+   */
+  cacheWebData: boolean;
+
+  /**
+   * Set this value if you the login process requires client credentials to be set. 
+   * You can pass the client credentials with the method: |unviredSDK.setClientCredentials(credentials)|
+   * The passed credentials will be used based on this flag.
+   */
+  requireClientCredentials: boolean;
 }
 export class LoginResult extends UnviredResult {
   type: LoginListenerType;
@@ -412,6 +431,12 @@ export class AuthenticateActivateResult extends UnviredResult {
 
 export class AuthenticateLocalResult extends UnviredResult {
   type: AuthenticateLocalResultType;
+}
+
+export class UnviredCredential {
+  user: string;
+  password: string;
+  port: string;
 }
 
 /**
@@ -1056,6 +1081,24 @@ export class UnviredCordovaSDK extends IonicNativePlugin {
   }
 
   /**
+   * Browser platform only. Call this function to save the WebData. This function can be used to preserve a large data that is downloaded.
+   * If you set the loginParameter flag, |cacheWebData|, then the plugin loads this data.
+   */
+  @Cordova()
+  dbSaveWebData(): Promise<any> {
+    return;
+  }
+
+  /**
+   * Browser platform only. Call this function to export the Webdata. 
+   * Call this function to export the Web 
+   */
+  @Cordova()
+  dbExportWebData(): Promise<any> {
+    return;
+  }
+
+  /**
    * Supported in Android & Windows only.
    * Launch a file from a file path
    * @param filePath file path
@@ -1511,6 +1554,42 @@ export class UnviredCordovaSDK extends IonicNativePlugin {
    */
   @Cordova()
   startDiscoveryService(): Promise<UnviredResult> {
+    return;
+  }
+
+  /**
+   * Use this function to set the SAP credentials to be sent to UMP.
+   * @param credentials Array of |Credential| objects.
+   */
+  @Cordova()
+  setClientCredentials(credentials: UnviredCredential[]) {
+    return;
+  }
+
+  /**
+   * Check for client credentials.
+   * @returns Returns true if client credentials are set
+   */
+  @Cordova()
+  isClientCredentialsSet(): Promise<UnviredResult> {
+    return;
+  }
+
+  /**
+   * Encrypt a string with the key stored by the Unvired SDK.
+   * @returns UnviredResult.data which should contains the encrypted string.
+   */
+   @Cordova()
+   encrypt(stringToBeEncrypted: string): Promise<UnviredResult> {
+     return;
+   }
+
+  /**
+   * Decrypt a string with the string encrypted with the key (key stored by the Unvired SDK)
+   * @returns UnviredResult.data which should contains the decrypted string.
+   */
+  @Cordova()
+  decrypt(stringToBeDecrypted: string): Promise<UnviredResult> {
     return;
   }
 }
