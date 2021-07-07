@@ -57,9 +57,9 @@ export interface Request {
  */
 @Plugin({
   pluginName: 'WebServer',
-  plugin: 'cordova-plugin-webserver',
+  plugin: 'cordova-plugin-webserver2',
   pluginRef: 'window.webserver',
-  repo: 'https://github.com/bykof/cordova-plugin-webserver.git',
+  repo: 'https://github.com/nguyenthanh1995/cordova-plugin-webserver2.git',
   platforms: ['Android', 'iOS'],
 })
 @Injectable()
