@@ -95,6 +95,14 @@ export class CustomUISDK extends IonicNativePlugin {
   }
 
   /**
+   * @return {Promise<any>} Returns object of response
+   */
+  @Cordova()
+  appInvoke(): Promise<any> {
+    return;
+  }
+
+  /**
    * @param cardNumber {string} card number
    * @param cardExpiry {string} card expiry
    * @param cardCvv {string} card cvv
