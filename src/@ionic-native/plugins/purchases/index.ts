@@ -40,6 +40,38 @@ export enum PURCHASE_TYPE {
 }
 
 /**
+ * Enum for billing features.
+ * Currently, these are only relevant for Google Play Android users:
+ * https://developer.android.com/reference/com/android/billingclient/api/BillingClient.FeatureType
+ */
+export enum BILLING_FEATURE {
+  /**
+   * Purchase/query for subscriptions.
+   */
+  SUBSCRIPTIONS,
+
+  /**
+   * Subscriptions update/replace.
+   */
+  SUBSCRIPTIONS_UPDATE,
+
+  /**
+   * Purchase/query for in-app items on VR.
+   */
+  IN_APP_ITEMS_ON_VR,
+
+  /**
+   * Purchase/query for subscriptions on VR.
+   */
+  SUBSCRIPTIONS_ON_VR,
+
+  /**
+   * Launch a price change confirmation flow.
+   */
+  PRICE_CHANGE_CONFIRMATION,
+}
+
+/**
  * @deprecated use PURCHASE_TYPE instead
  *
  * Enum for attribution networks
@@ -207,7 +239,7 @@ export enum INTRO_ELIGIBILITY_STATUS {
  */
 @Plugin({
   pluginName: 'Purchases',
-  plugin: 'cordova-plugin-purchases@2.1.1',
+  plugin: 'cordova-plugin-purchases@2.3.0',
   pluginRef: 'Purchases', // the variable reference to call the plugin, example: navigator.geolocation
   repo: 'https://github.com/RevenueCat/cordova-plugin-purchases', // the github repository URL for the plugin
   platforms: ['Android', 'iOS'], // Array of platforms supported, example: ['Android', 'iOS']
@@ -230,6 +262,13 @@ export class Purchases extends IonicNativePlugin {
    * @enum {string}
    */
   static PURCHASE_TYPE = PURCHASE_TYPE;
+
+  /**
+   * Enum for billing features.
+   * Currently, these are only relevant for Google Play Android users:
+   * https://developer.android.com/reference/com/android/billingclient/api/BillingClient.FeatureType
+   */
+  static BILLING_FEATURE = BILLING_FEATURE;
 
   /**
    * Replace SKU's ProrationMode.
@@ -290,7 +329,7 @@ export class Purchases extends IonicNativePlugin {
   /**
    * Gets the Offerings configured in the dashboard
    *
-   * @return {Observable<PurchasesOfferings>} Will return a [PurchasesError] if the offerings are not properly configured in RevenueCat or if there is another error retrieving them.
+   * @return {Promise<PurchasesOfferings>} Will return a [PurchasesError] if the offerings are not properly configured in RevenueCat or if there is another error retrieving them.
    */
   @Cordova()
   getOfferings(): Promise<PurchasesOfferings> {
@@ -383,6 +422,30 @@ export class Purchases extends IonicNativePlugin {
   }
 
   /**
+   * This function will logIn the current user with an appUserID. Typically this would be used after a log in 
+   * to identify a user without calling configure.
+   * @param {String} appUserID The appUserID that should be linked to the currently user
+   * 
+   * @return {Promise<LogInResult>} an object that contains the purchaserInfo after logging in, as well as a boolean indicating 
+   * whether the user has just been created for the first time in the RevenueCat backend. 
+   */
+  @Cordova()
+  public static logIn(appUserID: string): Promise<LogInResult> { 
+    return;
+  }
+
+  /**
+   * Logs out the Purchases client clearing the saved appUserID. This will generate a random user id and save it in the cache.
+   * If the current user is already anonymous, this will produce a PurchasesError.
+   * @return {Promise<PurchaserInfo>} new purchaser info after resetting.
+   */
+  @Cordova()
+  public static logOut(): Promise<PurchaserInfo> {
+    return;
+  }
+
+  /**
+   * @deprecated, use logIn instead.
    * This function will alias two appUserIDs together.
    * @param newAppUserID {String} The new appUserID that should be linked to the currently identified appUserID. Needs to be a string.
    *
@@ -395,6 +458,7 @@ export class Purchases extends IonicNativePlugin {
   }
 
   /**
+   * @deprecated, use logIn instead.
    * This function will identify the current user with an appUserID. Typically this would be used after a logout to identify a new user without calling configure
    * @param newAppUserID {String} The new appUserID that should be linked to the currently identified appUserID. Needs to be a string.
    *
@@ -407,6 +471,7 @@ export class Purchases extends IonicNativePlugin {
   }
 
   /**
+   * @deprecated, use logOut instead.
    * Resets the Purchases client clearing the saved appUserID. This will generate a random user id and save it in the cache.
    *
    * @return {Promise<PurchaserInfo>} Errors are of type [PurchasesError] and get normally triggered if there
@@ -449,6 +514,14 @@ export class Purchases extends IonicNativePlugin {
    */
   @Cordova({ sync: true })
   setDebugLogsEnabled(enabled: boolean): void {}
+
+  /**
+   * iOS only.
+   * @param {boolean} simulatesAskToBuyInSandbox Set this property to true *only* when testing the ask-to-buy / SCA purchases flow.
+   * More information: http://errors.rev.cat/ask-to-buy
+   */
+  @Cordova({ sync: true })
+  setSimulatesAskToBuyInSandbox(enabled: boolean): void {}
 
   /**
    * This method will send all the purchases to the RevenueCat backend. Call this when using your own implementation
@@ -546,6 +619,14 @@ export class Purchases extends IonicNativePlugin {
    */
   @Cordova({ sync: true })
   invalidatePurchaserInfoCache(): void {}
+
+  /**
+   * iOS only. Presents a code redemption sheet, useful for redeeming offer codes
+   * Refer to https://docs.revenuecat.com/docs/ios-subscription-offers#offer-codes for more information on how
+   * to configure and use offer codes.
+   */
+  @Cordova({ sync: true })
+  presentCodeRedemptionSheet(): void {}
 
   /**
    * Subscriber attributes are useful for storing additional, structured information on a user.
@@ -647,7 +728,7 @@ export class Purchases extends IonicNativePlugin {
    * @param adjustID Empty String or null will delete the subscriber attribute.
    */
   @Cordova({ sync: true })
-  setAdjustId(adjustId: string | null): void {}
+  setAdjustID(adjustID: string | null): void {}
 
   /**
    * Subscriber attribute associated with the AppsFlyer Id for the user
@@ -655,7 +736,7 @@ export class Purchases extends IonicNativePlugin {
    * @param appsflyerID Empty String or null will delete the subscriber attribute.
    */
   @Cordova({ sync: true })
-  setAppsflyerId(appsflyerId: string | null): void {}
+  setAppsflyerID(appsflyerID: string | null): void {}
 
   /**
    * Subscriber attribute associated with the Facebook SDK Anonymous Id for the user
@@ -664,7 +745,7 @@ export class Purchases extends IonicNativePlugin {
    * @param fbAnonymousID Empty String or null will delete the subscriber attribute.
    */
   @Cordova({ sync: true })
-  setFbAnonymousId(fbAnonymousId: string | null): void {}
+  setFBAnonymousID(fbAnonymousID: string | null): void {}
 
   /**
    * Subscriber attribute associated with the mParticle Id for the user
@@ -673,7 +754,7 @@ export class Purchases extends IonicNativePlugin {
    * @param mparticleID Empty String or null will delete the subscriber attribute.
    */
   @Cordova({ sync: true })
-  setMparticleId(mparticleId: string | null): void {}
+  setMparticleID(mparticleID: string | null): void {}
 
   /**
    * Subscriber attribute associated with the OneSignal Player Id for the user
@@ -682,7 +763,7 @@ export class Purchases extends IonicNativePlugin {
    * @param onesignalID Empty String or null will delete the subscriber attribute.
    */
   @Cordova({ sync: true })
-  setOnesignalId(onesignalId: string | null): void {}
+  setOnesignalID(onesignalID: string | null): void {}
 
   /**
    * Automatically collect subscriber attributes associated with the device identifiers.
@@ -691,6 +772,21 @@ export class Purchases extends IonicNativePlugin {
    */
   @Cordova({ sync: true })
   collectDeviceIdentifiers(): void {}
+
+  /**
+   * Check if billing is supported for the current user (meaning IN-APP purchases are supported)
+   * and optionally, whether a list of specified feature types are supported.
+   *
+   * Note: Billing features are only relevant to Google Play Android users.
+   * For other stores and platforms, billing features won't be checked.
+   * @param feature An array of feature types to check for support. Feature types must be one of
+   *       [BILLING_FEATURE]. By default, is an empty list and no specific feature support will be checked.
+   * @return {Promise<boolean>} Or [PurchasesError] if there is an error.
+   */
+  @Cordova()
+  canMakePayments(features: BILLING_FEATURE[] = []): Promise<boolean> {
+    return;
+  }
 
   /**
    * Set this property to your proxy URL before configuring Purchases *only* if you've received a proxy key value from your RevenueCat contact.
@@ -806,7 +902,7 @@ export interface PurchaserInfo {
    * Returns all the non-subscription purchases a user has made.
    * The purchases are ordered by purchase date in ascending order.
    */
-  readonly nonSubscriptionTransactions: [PurchasesTransaction];
+  readonly nonSubscriptionTransactions: PurchasesTransaction[];
   /**
    * The latest expiration date of all purchased skus
    */
@@ -960,7 +1056,7 @@ export interface PurchasesOffering {
   /**
    * Array of `Package` objects available for purchase.
    */
-  readonly availablePackages: [PurchasesPackage];
+  readonly availablePackages: PurchasesPackage[];
   /**
    * Lifetime package type configured in the RevenueCat dashboard, if available.
    */
@@ -1039,6 +1135,20 @@ export interface IntroEligibility {
    * Description of the status
    */
   readonly description: string;
+}
+
+/**
+ * Holds the logIn result
+ */
+export interface LogInResult {
+  /**
+   * The Purchaser Info for the user.
+   */
+  readonly purchaserInfo: PurchaserInfo;
+  /**
+   * True if the call resulted in a new user getting created in the RevenueCat backend.
+   */
+  readonly created: boolean;
 }
 
 export type ShouldPurchasePromoProductListener = (deferredPurchase: () => void) => void;
